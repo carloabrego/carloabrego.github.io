@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carlo Abrego · SOC Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:      #060d1a;
+  --bg2:     #0b1525;
+  --bg3:     #101e33;
+  --bg4:     #152540;
+  --blue:    #1e90ff;
+  --lblue:   #4db3ff;
+  --navy:    #0a1628;
+  --accent:  #00c8ff;
+  --green:   #00e5a0;
+  --yellow:  #ffc947;
+  --red:     #ff4d6d;
+  --text:    #b8cfe8;
+  --muted:   #3d5a7a;
+  --border:  rgba(30,144,255,0.18);
+  --glow:    rgba(0,200,255,0.06);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* Background noise + grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,120,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,120,255,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 52px;
+  background: rgba(6,13,26,0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+}
+.tb-left { display: flex; align-items: center; gap: 16px; }
+.tb-logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 3px;
+}
+.tb-sep { width: 1px; height: 20px; background: var(--border); }
+.tb-title { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+.tb-right { display: flex; align-items: center; gap: 20px; }
+.tb-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--green); font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
+}
+.dot-live {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 8px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.8)} }
+.tb-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--muted);
+}
+.tb-nav { display: flex; gap: 4px; }
+.tb-nav a {
+  font-size: 10px; color: var(--muted); text-decoration: none;
+  padding: 4px 10px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.tb-nav a:hover { color: var(--accent); background: var(--glow); }
+
+/* ── LAYOUT ── */
+#root {
+  padding-top: 52px;
+  min-height: 100vh;
+  position: relative; z-index: 1;
+}
+
+/* ── HERO PANEL ── */
+#hero {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-main {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 28px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-main::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--accent), var(--green));
+}
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; color: var(--accent); letter-spacing: 3px;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+.hero-eyebrow::before { content: '[ '; color: var(--muted); }
+.hero-eyebrow::after  { content: ' ]'; color: var(--muted); }
+.hero-name {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(32px,4vw,52px); font-weight: 700;
+  color: #fff; line-height: 1; margin-bottom: 4px;
+}
+.hero-name span { color: var(--accent); }
+.hero-role {
+  font-size: 14px; color: var(--lblue); font-weight: 600;
+  letter-spacing: 2px; margin-bottom: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.hero-bio {
+  font-size: 13px; line-height: 1.75; color: var(--text);
+  max-width: 580px; margin-bottom: 22px;
+}
+.hero-links { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--accent); text-decoration: none;
+  border: 1px solid rgba(0,200,255,0.25); padding: 5px 14px; border-radius: 3px;
+  transition: all 0.2s; letter-spacing: 1px;
+}
+.hero-link:hover { background: rgba(0,200,255,0.1); border-color: var(--accent); }
+
+/* side stat cards */
+.hero-side { display: flex; flex-direction: column; gap: 12px; }
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 18px 20px; flex: 1;
+  position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+}
+.stat-card.blue::after  { background: var(--blue); }
+.stat-card.green::after { background: var(--green); }
+.stat-card.yellow::after{ background: var(--yellow); }
+.sc-label { font-size: 9px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+.sc-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px; font-weight: 700; color: #fff; line-height: 1;
+}
+.sc-value.blue   { color: var(--lblue); }
+.sc-value.green  { color: var(--green); }
+.sc-value.yellow { color: var(--yellow); }
+.sc-sub { font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; }
+
+/* ── SECTION WRAPPER ── */
+.section { padding: 20px 24px; }
+.section-header {
+  display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px;
+}
+.sh-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; color: var(--accent); letter-spacing: 3px;
+  text-transform: uppercase; background: rgba(0,200,255,0.08);
+  border: 1px solid rgba(0,200,255,0.2); padding: 3px 10px; border-radius: 2px;
+}
+.sh-title {
+  font-size: 18px; font-weight: 700; color: #fff;
+}
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; gap: 12px; }
+.job-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  display: grid; grid-template-columns: 180px 1fr;
+  overflow: hidden; transition: border-color 0.3s;
+}
+.job-card:hover { border-color: rgba(0,200,255,0.4); }
+.job-left {
+  background: var(--bg3); padding: 20px 18px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.job-period {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; color: var(--green); letter-spacing: 2px; text-transform: uppercase;
+}
+.job-co {
+  font-size: 14px; font-weight: 700; color: #fff;
+}
+.job-loc { font-size: 10px; color: var(--muted); }
+.job-badge {
+  display: inline-block; margin-top: 4px;
+  font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 2px;
+}
+.job-badge.current { background: rgba(0,229,160,0.12); color: var(--green); border: 1px solid rgba(0,229,160,0.3); }
+.job-badge.past    { background: rgba(30,144,255,0.1);  color: var(--lblue); border: 1px solid rgba(30,144,255,0.2); }
+
+.job-right { padding: 20px 24px; }
+.job-title { font-size: 15px; font-weight: 600; color: var(--accent); margin-bottom: 12px; }
+.job-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.job-bullets li {
+  font-size: 12px; color: var(--text); line-height: 1.6;
+  padding-left: 16px; position: relative;
+}
+.job-bullets li::before {
+  content: '›'; position: absolute; left: 0;
+  color: var(--blue); font-size: 14px; line-height: 1.4;
+}
+
+/* ── SKILLS DASHBOARD ── */
+.skills-legend {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 16px; padding: 12px 16px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+}
+.leg-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+.leg-dot.prod  { background: var(--green); box-shadow: 0 0 6px rgba(0,229,160,0.5); }
+.leg-dot.daily { background: var(--accent); box-shadow: 0 0 6px rgba(0,200,255,0.4); }
+.leg-dot.know  { background: var(--muted); }
+
+.skills-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+.skill-panel {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 18px 20px; transition: border-color 0.3s;
+}
+.skill-panel:hover { border-color: rgba(0,200,255,0.3); }
+.sp-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.sp-icon { font-size: 16px; }
+.sp-title { font-size: 10px; font-weight: 700; color: var(--lblue); letter-spacing: 2px; text-transform: uppercase; flex: 1; }
+.sp-count { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); }
+
+.sp-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.sp-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; padding: 4px 10px; border-radius: 3px;
+  letter-spacing: 0.5px; border: 1px solid transparent;
+  transition: all 0.2s; cursor: default;
+}
+.sp-tag:hover { transform: translateY(-1px); }
+/* Producción — uso activo en entornos reales */
+.sp-tag.prod {
+  background: rgba(0,229,160,0.08);
+  color: var(--green);
+  border-color: rgba(0,229,160,0.25);
+}
+.sp-tag.prod:hover { background: rgba(0,229,160,0.15); }
+/* Uso diario / operacional */
+.sp-tag.daily {
+  background: rgba(0,200,255,0.07);
+  color: var(--accent);
+  border-color: rgba(0,200,255,0.2);
+}
+.sp-tag.daily:hover { background: rgba(0,200,255,0.14); }
+/* Conocimiento / estudiado */
+.sp-tag.know {
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.08);
+}
+.sp-tag.know:hover { background: rgba(255,255,255,0.07); }
+
+/* ── CERTS GRID ── */
+.certs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+.cert-panel {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 18px 16px; text-align: center; transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.cert-panel:hover { transform: translateY(-3px); border-color: rgba(0,200,255,0.4); }
+.cert-panel.star { border-color: rgba(0,229,160,0.35); }
+.cert-panel.star::before {
+  content: 'GCIH 97%';
+  position: absolute; top: 0; right: 0;
+  background: var(--green); color: #000;
+  font-size: 8px; font-weight: 700; padding: 3px 8px; letter-spacing: 1px;
+}
+.cert-panel.inprog { border-color: rgba(255,201,71,0.25); opacity: 0.8; }
+.cert-icon2 { font-size: 26px; margin-bottom: 8px; }
+.cert-name2 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.cert-issuer { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.cert-tag {
+  display: inline-block; margin-top: 8px;
+  font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 2px;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.cert-tag.active { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.25); }
+.cert-tag.pending { background: rgba(255,201,71,0.1); color: var(--yellow); border: 1px solid rgba(255,201,71,0.25); }
+
+/* ── ALERT LOG (education + contact) ── */
+.alert-log {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.alert-row {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+  display: flex; align-items: center; gap: 16px; padding: 14px 18px;
+  font-size: 12px; transition: border-color 0.2s;
+}
+.alert-row:hover { border-color: rgba(0,200,255,0.3); }
+.ar-id { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); min-width: 60px; }
+.ar-severity {
+  font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 2px;
+  letter-spacing: 1px; text-transform: uppercase; min-width: 70px; text-align: center;
+}
+.sev-info   { background: rgba(30,144,255,0.12); color: var(--lblue); border: 1px solid rgba(30,144,255,0.25); }
+.sev-ok     { background: rgba(0,229,160,0.08);  color: var(--green); border: 1px solid rgba(0,229,160,0.2); }
+.ar-text { color: var(--text); flex: 1; }
+.ar-sub  { font-size: 10px; color: var(--muted); }
+
+/* ── CONTACT FOOTER ── */
+#contacto {
+  border-top: 1px solid var(--border);
+  padding: 24px 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 24px;
+  position: relative; z-index: 1;
+}
+.contact-items { display: flex; gap: 20px; flex-wrap: wrap; }
+.ci {
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none; color: var(--text);
+  font-size: 12px; transition: color 0.2s;
+}
+.ci:hover { color: var(--accent); }
+.ci-icon { font-size: 14px; }
+.footer-right { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); text-align: right; line-height: 1.8; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+@media (max-width: 768px) {
+  #topbar { padding: 0 14px; }
+  .tb-nav, .tb-sep, .tb-title { display: none; }
+  #hero { grid-template-columns: 1fr; padding: 14px; }
+  .hero-side { flex-direction: row; }
+  .section { padding: 14px; }
+  .job-card { grid-template-columns: 1fr; }
+  .job-left { border-right: none; border-bottom: 1px solid var(--border); }
+  #contacto { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">CA.SOC</div>
+    <div class="tb-sep"></div>
+    <div class="tb-title">Security Operations · Portfolio</div>
+  </div>
+  <div class="tb-nav">
+    <a href="#exp">Experiencia</a>
+    <a href="#skills">Skills</a>
+    <a href="#certs">Certs</a>
+    <a href="#edu">Educación</a>
+  </div>
+  <div class="tb-right">
+    <div class="tb-status"><div class="dot-live"></div>AVAILABLE</div>
+    <div class="tb-time" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<div id="root">
+
+  <!-- HERO -->
+  <div id="hero">
+    <div class="hero-main">
+      <div class="hero-eyebrow">Analista Senior · Buenos Aires, AR</div>
+      <div class="hero-name">Carlo<span> Abrego</span></div>
+      <div class="hero-role" id="role-text">Cybersecurity Engineer_</div>
+      <p class="hero-bio">
+        Certificado GIAC GCIH (97%), con base sólida en seguridad, redes y operación de infraestructura.
+        Experiencia en firewalls Palo Alto, análisis de incidentes con Cortex XDR, gestión de accesos y hardening.
+        Actualmente preparando AWS Solution Architect Associate.
+      </p>
+      <div class="hero-links">
+        <a href="mailto:carloabrego10@gmail.com" class="hero-link">✉ Email</a>
+        <a href="https://linkedin.com/in/carloabrego" target="_blank" class="hero-link">in LinkedIn</a>
+        <a href="tel:+5491161946793" class="hero-link">☏ +54 9 11 6194-6793</a>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="stat-card green">
+        <div class="sc-label">GCIH Score</div>
+        <div class="sc-value green">97<span style="font-size:16px;color:var(--muted)">%</span></div>
+        <div class="sc-sub">Top performer · GIAC</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="sc-label">Años de experiencia</div>
+        <div class="sc-value blue">4<span style="font-size:16px;color:var(--muted)">+</span></div>
+        <div class="sc-sub">Cybersecurity Engineer</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="sc-label">Certificaciones</div>
+        <div class="sc-value yellow">8<span style="font-size:16px;color:var(--muted)">+</span></div>
+        <div class="sc-sub">GIAC · Palo Alto · Red Hat</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPERIENCIA -->
+  <div class="section reveal" id="exp">
+    <div class="section-header">
+      <div class="sh-tag">EXP</div>
+      <div class="sh-title">Historial de Incidentes — Experiencia Laboral</div>
+    </div>
+    <div class="timeline">
+
+      <div class="job-card">
+        <div class="job-left">
+          <div class="job-period">OCT 2025 — HOY</div>
+          <div class="job-co">ACSYS Latam</div>
+          <div class="job-loc">📍 Buenos Aires</div>
+          <div class="job-badge current">● ACTIVO</div>
+        </div>
+        <div class="job-right">
+          <div class="job-title">Cybersecurity Engineer</div>
+          <ul class="job-bullets">
+            <li>Implementación y puesta en producción de firewalls Palo Alto NGFW para sitio de contingencia de la Legislatura de la Ciudad de Buenos Aires.</li>
+            <li>Diseño y configuración de políticas de seguridad, NAT, VPN site-to-site y segmentación de red.</li>
+            <li>Hardening y validación según buenas prácticas de seguridad perimetral.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="job-card">
+        <div class="job-left">
+          <div class="job-period">AGO 2022 — OCT 2025</div>
+          <div class="job-co">MURC</div>
+          <div class="job-loc">📍 Buenos Aires</div>
+          <div class="job-badge past">COMPLETADO</div>
+        </div>
+        <div class="job-right">
+          <div class="job-title">Cybersecurity Engineer</div>
+          <ul class="job-bullets">
+            <li>Análisis y respuesta a incidentes de phishing con Cortex XDR — clientes: Banco Columbia y Ternium.</li>
+            <li>Configuración avanzada NGFW Palo Alto: políticas, NAT, VPNs, SAML, GlobalProtect, firewalls en Google Cloud.</li>
+            <li>Soporte Appgate SDP (ZTNA) y Barracuda Email Protection (antispam / phishing).</li>
+            <li>Gestión de vulnerabilidades con Vicarius vRx y armado de SOC interno con playbooks en Python.</li>
+            <li>Colaboración en posicionamiento como Partner Platinum Palo Alto — 4 certificaciones obtenidas.</li>
+            <li>Migración de Sophos y Fortinet a Palo Alto NGFW.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="job-card">
+        <div class="job-left">
+          <div class="job-period">ENE 2022 — JUL 2022</div>
+          <div class="job-co">LinkSolution</div>
+          <div class="job-loc">📍 Buenos Aires</div>
+          <div class="job-badge past">COMPLETADO</div>
+        </div>
+        <div class="job-right">
+          <div class="job-title">Analista de Seguridad Informática</div>
+          <ul class="job-bullets">
+            <li>ABM de usuarios en Active Directory y SAP.</li>
+            <li>Automatización de auditoría en Windows y Azure con PowerShell — ahorro de +4 horas/día.</li>
+            <li>Revisión de eventos en Wazuh SIEM y Office365 Defender para reportes semanales.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="job-card">
+        <div class="job-left">
+          <div class="job-period">MAY 2021 — DIC 2021</div>
+          <div class="job-co">YEL Informática</div>
+          <div class="job-loc">📍 Buenos Aires</div>
+          <div class="job-badge past">COMPLETADO</div>
+        </div>
+        <div class="job-right">
+          <div class="job-title">IAM Access Management</div>
+          <ul class="job-bullets">
+            <li>Gestión IAM para Cencosud — altas y modificaciones en Active Directory, Exchange y aplicativos empresariales.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section reveal" id="skills">
+    <div class="section-header">
+      <div class="sh-tag">SKL</div>
+      <div class="sh-title">Threat Coverage — Stack Técnico</div>
+    </div>
+
+    <!-- Legend -->
+    <div class="skills-legend">
+      <div class="leg-item"><div class="leg-dot prod"></div>Producción — uso real en clientes</div>
+      <div class="leg-item"><div class="leg-dot daily"></div>Operacional — uso frecuente</div>
+      <div class="leg-item"><div class="leg-dot know"></div>Conocimiento — estudiado/lab</div>
+    </div>
+
+    <div class="skills-dashboard">
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">🔥</div>
+          <div class="sp-title">Firewalls & Perimetral</div>
+          <div class="sp-count">6 tools</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag prod">Palo Alto NGFW</span>
+          <span class="sp-tag prod">GlobalProtect</span>
+          <span class="sp-tag prod">VPN Site-to-Site</span>
+          <span class="sp-tag prod">SAML / SSO</span>
+          <span class="sp-tag daily">Fortinet</span>
+          <span class="sp-tag daily">Sophos</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">🛡️</div>
+          <div class="sp-title">SOC / SIEM / XDR</div>
+          <div class="sp-count">5 tools</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag prod">Cortex XDR</span>
+          <span class="sp-tag prod">Wazuh SIEM</span>
+          <span class="sp-tag daily">O365 Defender</span>
+          <span class="sp-tag daily">TheHive</span>
+          <span class="sp-tag daily">Playbook Design</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">🔬</div>
+          <div class="sp-title">DFIR & Forense</div>
+          <div class="sp-count">5 tools</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag daily">Volatility</span>
+          <span class="sp-tag daily">Hayabusa</span>
+          <span class="sp-tag daily">Sysinternals Suite</span>
+          <span class="sp-tag daily">RITA — C2 Detection</span>
+          <span class="sp-tag know">Análisis de memoria</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">🔍</div>
+          <div class="sp-title">Threat Intel & OSINT</div>
+          <div class="sp-count">5 tools</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag daily">VirusTotal</span>
+          <span class="sp-tag daily">Shodan</span>
+          <span class="sp-tag daily">AbuseIPDB</span>
+          <span class="sp-tag daily">Whois / DNS</span>
+          <span class="sp-tag know">MITRE ATT&CK</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">⌨️</div>
+          <div class="sp-title">Scripting & Automatización</div>
+          <div class="sp-count">3 langs</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag prod">PowerShell</span>
+          <span class="sp-tag daily">Python</span>
+          <span class="sp-tag daily">Bash</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">☁️</div>
+          <div class="sp-title">Cloud & Virtualización</div>
+          <div class="sp-count">4 plataformas</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag prod">GCP — Firewalls</span>
+          <span class="sp-tag daily">VMware vCenter</span>
+          <span class="sp-tag daily">Azure AD</span>
+          <span class="sp-tag know">AWS (→ SAA)</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">🔒</div>
+          <div class="sp-title">Zero Trust & Email Sec</div>
+          <div class="sp-count">3 soluciones</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag prod">Appgate SDP (ZTNA)</span>
+          <span class="sp-tag prod">Barracuda Email</span>
+          <span class="sp-tag daily">Vicarius vRx</span>
+        </div>
+      </div>
+
+      <div class="skill-panel">
+        <div class="sp-header">
+          <div class="sp-icon">💀</div>
+          <div class="sp-title">Red Team / Ofensivo</div>
+          <div class="sp-count">7 tools</div>
+        </div>
+        <div class="sp-tags">
+          <span class="sp-tag know">Metasploit</span>
+          <span class="sp-tag know">Mimikatz</span>
+          <span class="sp-tag know">Responder</span>
+          <span class="sp-tag daily">Nmap / Masscan</span>
+          <span class="sp-tag know">Hashcat</span>
+          <span class="sp-tag know">Netcat / Pivoting</span>
+          <span class="sp-tag know">Legba</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CERTS -->
+  <div class="section reveal" id="certs">
+    <div class="section-header">
+      <div class="sh-tag">CERT</div>
+      <div class="sh-title">Credenciales Validadas</div>
+    </div>
+    <div class="certs-grid">
+      <div class="cert-panel star">
+        <div class="cert-icon2">🏆</div>
+        <div class="cert-name2">GIAC GCIH</div>
+        <div class="cert-issuer">GIAC · Incident Handler</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel">
+        <div class="cert-icon2">🔥</div>
+        <div class="cert-name2">PCNSE</div>
+        <div class="cert-issuer">Palo Alto Networks</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel">
+        <div class="cert-icon2">🔥</div>
+        <div class="cert-name2">PCNSA</div>
+        <div class="cert-issuer">Palo Alto Networks</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel">
+        <div class="cert-icon2">🐧</div>
+        <div class="cert-name2">RHCSA</div>
+        <div class="cert-issuer">Red Hat</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel">
+        <div class="cert-icon2">🌐</div>
+        <div class="cert-name2">CCNA</div>
+        <div class="cert-issuer">Cisco</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel">
+        <div class="cert-icon2">☁️</div>
+        <div class="cert-name2">AWS CCP</div>
+        <div class="cert-issuer">Amazon Web Services</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel">
+        <div class="cert-icon2">🎯</div>
+        <div class="cert-name2">SOC Level 1</div>
+        <div class="cert-issuer">TryHackMe</div>
+        <div class="cert-tag active">Activa</div>
+      </div>
+      <div class="cert-panel inprog">
+        <div class="cert-icon2">⏳</div>
+        <div class="cert-name2">AWS SAA</div>
+        <div class="cert-issuer">Amazon Web Services</div>
+        <div class="cert-tag pending">En progreso</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDUCACIÓN -->
+  <div class="section reveal" id="edu">
+    <div class="section-header">
+      <div class="sh-tag">EDU</div>
+      <div class="sh-title">Log de Formación Académica</div>
+    </div>
+    <div class="alert-log">
+      <div class="alert-row">
+        <div class="ar-id">#EDU-001</div>
+        <div class="ar-severity sev-info">EN CURSO</div>
+        <div>
+          <div class="ar-text">Ingeniería en Informática — 3er año</div>
+          <div class="ar-sub">Universidad Nacional Arturo Jauretche · Buenos Aires · Desde 2017</div>
+        </div>
+      </div>
+      <div class="alert-row">
+        <div class="ar-id">#EDU-002</div>
+        <div class="ar-severity sev-ok">COMPLETADO</div>
+        <div>
+          <div class="ar-text">Diplomatura en Ciberseguridad ICS/OT</div>
+          <div class="ar-sub">Universidad Nacional Santo Tomás de Aquino · Buenos Aires</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACTO -->
+  <div id="contacto">
+    <div class="contact-items">
+      <a href="mailto:carloabrego10@gmail.com" class="ci"><span class="ci-icon">✉</span> carloabrego10@gmail.com</a>
+      <a href="https://linkedin.com/in/carloabrego" target="_blank" class="ci"><span class="ci-icon">💼</span> linkedin.com/in/carloabrego</a>
+      <a href="tel:+5491161946793" class="ci"><span class="ci-icon">📱</span> +54 9 11 6194-6793</a>
+    </div>
+    <div class="footer-right">
+      Carlo Andres Abrego · Buenos Aires, AR<br>
+      <span style="color:var(--accent)">GCIH · PCNSE · PCNSA · RHCSA · CCNA</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries =>
+  entries.forEach(e => e.isIntersecting && e.target.classList.add('visible'))
+, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+
+
+// Role typing
+const roles = ['Cybersecurity Engineer_', 'Incident Responder (GCIH)_', 'Palo Alto PCNSE_', 'SOC Engineer_'];
+let ri = 0;
+setInterval(() => {
+  ri = (ri + 1) % roles.length;
+  const el = document.getElementById('role-text');
+  el.style.opacity = '0';
+  setTimeout(() => { el.textContent = roles[ri]; el.style.opacity = '1'; }, 300);
+}, 2800);
+document.getElementById('role-text').style.transition = 'opacity 0.3s';
+</script>
+</body>
+</html>
