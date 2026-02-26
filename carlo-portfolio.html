@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carlo Abrego · Cybersecurity Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #050a0e;
+  --bg2: #0a1520;
+  --bg3: #0d1f2d;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff6b35;
+  --text: #c9d8e8;
+  --muted: #4a6070;
+  --border: rgba(0, 212, 255, 0.15);
+  --glow: rgba(0, 212, 255, 0.08);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* Animated grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scan line effect */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(5,10,14,0.9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+.nav-logo span { color: var(--green); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--cyan); }
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 100px 80px 60px;
+  position: relative;
+  z-index: 1;
+}
+.hero-content { max-width: 700px; }
+
+.terminal-tag {
+  font-size: 11px;
+  color: var(--green);
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease forwards;
+}
+.terminal-tag::before { content: '> '; color: var(--muted); }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.1s forwards;
+}
+h1 .highlight { color: var(--cyan); }
+
+.hero-subtitle {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: var(--orange);
+  font-weight: 600;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.2s forwards;
+}
+
+.hero-bio {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  max-width: 560px;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.3s forwards;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.4s forwards;
+}
+.badge {
+  background: rgba(0,212,255,0.07);
+  border: 1px solid var(--border);
+  color: var(--cyan);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 2px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.badge.green { color: var(--green); border-color: rgba(0,255,136,0.2); background: rgba(0,255,136,0.05); }
+.badge.orange { color: var(--orange); border-color: rgba(255,107,53,0.2); background: rgba(255,107,53,0.05); }
+
+.hero-contacts {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.5s forwards;
+}
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+.contact-link:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* Glowing orb */
+.hero-orb {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, rgba(0,255,136,0.06) 40%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.hero-orb::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,212,255,0.15);
+  animation: spin 20s linear infinite;
+}
+.hero-orb::after {
+  content: '';
+  position: absolute;
+  inset: 60px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0,255,136,0.1);
+  animation: spin 12s linear infinite reverse;
+}
+
+@keyframes pulse { 0%,100%{transform:translateY(-50%) scale(1)} 50%{transform:translateY(-50%) scale(1.05)} }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* SECTION TEMPLATE */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 80px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.section-label::before { content: '// '; color: var(--muted); }
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 48px;
+  line-height: 1;
+}
+h2 em { color: var(--cyan); font-style: normal; }
+
+/* DIVIDER */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* EXPERIENCE */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.job {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0 40px;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.job:first-child { border-top: 1px solid var(--border); }
+.job-meta { padding-top: 4px; }
+.job-period {
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.job-company {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.job-location {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.job-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 14px;
+}
+.job-bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.job-bullets li {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+  padding-left: 18px;
+  position: relative;
+}
+.job-bullets li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--cyan);
+  font-size: 10px;
+}
+
+/* SKILLS GRID */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.skill-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 22px 24px;
+  border-radius: 4px;
+  transition: border-color 0.3s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.skill-card:hover { border-color: rgba(0,212,255,0.4); background: var(--bg3); }
+.skill-card:hover::before { transform: scaleX(1); }
+.skill-card-title {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.skill-card-title span { font-size: 16px; }
+.skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.skill-tag {
+  font-size: 10px;
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 3px 10px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+
+/* CERTS */
+.certs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.cert-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 4px;
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+}
+.cert-card.featured {
+  border-color: rgba(0,255,136,0.3);
+  background: rgba(0,255,136,0.04);
+}
+.cert-card.featured::after {
+  content: '⭐ DESTACADO';
+  position: absolute;
+  top: -1px; right: -1px;
+  background: var(--green);
+  color: #000;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 3px 8px;
+  letter-spacing: 1px;
+}
+.cert-card:hover { transform: translateY(-3px); border-color: var(--cyan); }
+.cert-icon { font-size: 28px; margin-bottom: 10px; }
+.cert-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.cert-org { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.cert-score {
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+/* CONTACT / FOOTER */
+#contacto {
+  text-align: center;
+  padding: 80px;
+}
+.contact-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 40px;
+}
+.contact-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 24px 40px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.3s;
+  min-width: 200px;
+}
+.contact-card:hover { border-color: var(--cyan); background: var(--glow); transform: translateY(-4px); }
+.contact-card-icon { font-size: 24px; }
+.contact-card-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+.contact-card-value { font-size: 12px; color: var(--cyan); }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* Typing cursor */
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--cyan);
+  vertical-align: text-bottom;
+  animation: blink 0.8s step-end infinite;
+  margin-left: 4px;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Status dot */
+.status-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 8px;
+  box-shadow: 0 0 8px var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  nav { padding: 14px 20px; }
+  .nav-links { display: none; }
+  #hero { padding: 100px 24px 60px; }
+  .hero-orb { display: none; }
+  section { padding: 60px 24px; }
+  .divider { margin: 0 24px; }
+  .job { grid-template-columns: 1fr; gap: 10px; }
+  footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+  #contacto { padding: 60px 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">CA<span>.</span>sec</div>
+  <div class="nav-links">
+    <a href="#experiencia">Experiencia</a>
+    <a href="#skills">Skills</a>
+    <a href="#certs">Certs</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" style="max-width:100%;padding-top:100px;">
+  <div class="hero-content">
+    <div class="terminal-tag"><span class="status-dot"></span>Disponible para nuevos roles</div>
+    <h1>Carlo<br><span class="highlight">Abrego</span></h1>
+    <div class="hero-subtitle">Cybersecurity Engineer</div>
+    <p class="hero-bio">
+      Certificado GIAC GCIH (97%), con base sólida en seguridad, redes y operación de infraestructura.
+      Experiencia en firewalls Palo Alto, análisis de incidentes, gestión de accesos y hardening de sistemas.
+      Actualmente preparando AWS Solution Architect Associate.<span class="cursor"></span>
+    </p>
+    <div class="hero-badges">
+      <div class="badge green">GIAC GCIH 97%</div>
+      <div class="badge">PCNSE</div>
+      <div class="badge">PCNSA</div>
+      <div class="badge">RHCSA</div>
+      <div class="badge">CCNA</div>
+      <div class="badge orange">AWS → SAA In Progress</div>
+    </div>
+    <div class="hero-contacts">
+      <a href="mailto:carloabrego10@gmail.com" class="contact-link">✉ carloabrego10@gmail.com</a>
+      <a href="https://linkedin.com/in/carloabrego" target="_blank" class="contact-link">in linkedin.com/in/carloabrego</a>
+      <a href="tel:+5491161946793" class="contact-link">☏ +54 9 11 6194-6793</a>
+    </div>
+  </div>
+  <div class="hero-orb"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- EXPERIENCIA -->
+<section id="experiencia">
+  <div class="reveal">
+    <div class="section-label">experiencia profesional</div>
+    <h2>Trayectoria <em>laboral</em></h2>
+  </div>
+  <div class="timeline reveal">
+
+    <div class="job">
+      <div class="job-meta">
+        <div class="job-period">OCT 2025 — ACTUAL</div>
+        <div class="job-company">ACSYS Latam</div>
+        <div class="job-location">📍 Buenos Aires, AR</div>
+      </div>
+      <div>
+        <div class="job-title">Cybersecurity Engineer</div>
+        <ul class="job-bullets">
+          <li>Implementación y puesta en producción de firewalls Palo Alto NGFW para sitio de contingencia de la Legislatura de la Ciudad de Buenos Aires.</li>
+          <li>Diseño y configuración de políticas de seguridad, NAT, VPN site-to-site y segmentación de red.</li>
+          <li>Hardening y validación de configuraciones según buenas prácticas de seguridad perimetral.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div class="job-period">AGO 2022 — OCT 2025</div>
+        <div class="job-company">MURC</div>
+        <div class="job-location">📍 Buenos Aires, AR</div>
+      </div>
+      <div>
+        <div class="job-title">Cybersecurity Engineer</div>
+        <ul class="job-bullets">
+          <li>Análisis y respuesta a incidentes de phishing utilizando Cortex XDR — clientes enterprise: Banco Columbia y Ternium.</li>
+          <li>Configuración avanzada de NGFW Palo Alto: políticas, objetos, NAT, VPNs, SAML, GlobalProtect, certificados y firewalls virtualizados en Google Cloud.</li>
+          <li>Soporte en Appgate SDP (ZTNA) y Barracuda Email Protection (antispam / phishing).</li>
+          <li>Gestión de parcheos de vulnerabilidades con Vicarius vRx.</li>
+          <li>Armado de SOC interno y formación de playbooks con herramientas opensource y Python.</li>
+          <li>Colaboración en el posicionamiento como Partner Platinum de Palo Alto — 4 certificaciones obtenidas.</li>
+          <li>Migración de configuraciones de firewall Sophos y Fortinet a equipos Palo Alto NGFW.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div class="job-period">ENE 2022 — JUL 2022</div>
+        <div class="job-company">LinkSolution</div>
+        <div class="job-location">📍 Buenos Aires, AR</div>
+      </div>
+      <div>
+        <div class="job-title">Analista de Seguridad Informática</div>
+        <ul class="job-bullets">
+          <li>ABM de usuarios en Active Directory y aplicativos como SAP.</li>
+          <li>Automatización de auditoría en Windows y Azure con PowerShell — ahorro de +4 horas de trabajo diario.</li>
+          <li>Revisión de eventos en SIEM Wazuh y Office365 Defender para generación de reportes semanales.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div class="job-period">MAY 2021 — DIC 2021</div>
+        <div class="job-company">YEL Informática</div>
+        <div class="job-location">📍 Buenos Aires, AR</div>
+      </div>
+      <div>
+        <div class="job-title">IAM Access Management</div>
+        <ul class="job-bullets">
+          <li>Gestión de accesos para cliente Cencosud — altas y modificaciones en Active Directory, Exchange y aplicativos empresariales.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="reveal">
+    <div class="section-label">habilidades técnicas</div>
+    <h2>Stack <em>técnico</em></h2>
+  </div>
+  <div class="skills-grid reveal">
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>🔥</span> Firewalls & Red</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Palo Alto NGFW</span>
+        <span class="skill-tag">FortiGate</span>
+        <span class="skill-tag">Sophos</span>
+        <span class="skill-tag">VPN Site-to-Site</span>
+        <span class="skill-tag">GlobalProtect</span>
+        <span class="skill-tag">SAML</span>
+        <span class="skill-tag">NAT</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>🛡️</span> EDR / SIEM / XDR</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Cortex XDR</span>
+        <span class="skill-tag">Wazuh SIEM</span>
+        <span class="skill-tag">Office365 Defender</span>
+        <span class="skill-tag">TheHive</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>🔍</span> Threat Intel & OSINT</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Shodan</span>
+        <span class="skill-tag">VirusTotal</span>
+        <span class="skill-tag">AbuseIPDB</span>
+        <span class="skill-tag">Whois</span>
+        <span class="skill-tag">RITA (C2)</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>💀</span> Ofensivo / Red Team</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Metasploit</span>
+        <span class="skill-tag">Mimikatz</span>
+        <span class="skill-tag">Responder</span>
+        <span class="skill-tag">Hashcat</span>
+        <span class="skill-tag">Nmap</span>
+        <span class="skill-tag">Masscan</span>
+        <span class="skill-tag">Netcat</span>
+        <span class="skill-tag">Legba</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>🔬</span> Forense & DFIR</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Volatility</span>
+        <span class="skill-tag">Hayabusa</span>
+        <span class="skill-tag">Sysinternals</span>
+        <span class="skill-tag">Análisis de logs</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>⌨️</span> Scripting & Dev</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">Bash</span>
+        <span class="skill-tag">PowerShell</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>☁️</span> Cloud & Virtualización</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Google Cloud</span>
+        <span class="skill-tag">AWS (CCP)</span>
+        <span class="skill-tag">Azure</span>
+        <span class="skill-tag">VMware vCenter</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-title"><span>🔒</span> Zero Trust & Email</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Appgate SDP</span>
+        <span class="skill-tag">Barracuda Email</span>
+        <span class="skill-tag">Vicarius vRx</span>
+        <span class="skill-tag">ZTNA</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CERTS -->
+<section id="certs">
+  <div class="reveal">
+    <div class="section-label">certificaciones</div>
+    <h2>Credenciales <em>obtenidas</em></h2>
+  </div>
+  <div class="certs-grid reveal">
+    <div class="cert-card featured">
+      <div class="cert-icon">🏆</div>
+      <div class="cert-name">GIAC GCIH</div>
+      <div class="cert-org">GIAC · Incident Handler</div>
+      <div class="cert-score">97% — Top Score</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🔥</div>
+      <div class="cert-name">PCNSE</div>
+      <div class="cert-org">Palo Alto Networks</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🔥</div>
+      <div class="cert-name">PCNSA</div>
+      <div class="cert-org">Palo Alto Networks</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🐧</div>
+      <div class="cert-name">RHCSA</div>
+      <div class="cert-org">Red Hat</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🌐</div>
+      <div class="cert-name">CCNA</div>
+      <div class="cert-org">Cisco</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">☁️</div>
+      <div class="cert-name">AWS CCP</div>
+      <div class="cert-org">Amazon Web Services</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🎯</div>
+      <div class="cert-name">TH SOC Level 1</div>
+      <div class="cert-org">TryHackMe</div>
+    </div>
+    <div class="cert-card" style="border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.04);">
+      <div class="cert-icon">⏳</div>
+      <div class="cert-name">AWS SAA</div>
+      <div class="cert-org">En proceso...</div>
+      <div class="cert-score" style="color:var(--orange)">→ In Progress</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- EDUCACION -->
+<section id="educacion">
+  <div class="reveal">
+    <div class="section-label">educación</div>
+    <h2>Formación <em>académica</em></h2>
+  </div>
+  <div class="timeline reveal">
+    <div class="job">
+      <div class="job-meta">
+        <div class="job-period">ABR 2017 — ACTUAL</div>
+        <div class="job-company">UNAJ</div>
+        <div class="job-location">📍 Buenos Aires, AR</div>
+      </div>
+      <div>
+        <div class="job-title" style="color:var(--text)">Ingeniería en Informática</div>
+        <ul class="job-bullets">
+          <li>3er año — carrera en curso</li>
+          <li>Universidad Nacional Arturo Jauretche</li>
+        </ul>
+      </div>
+    </div>
+    <div class="job">
+      <div class="job-meta">
+        <div class="job-period">Finalizado</div>
+        <div class="job-company">UNSTA</div>
+        <div class="job-location">📍 Buenos Aires, AR</div>
+      </div>
+      <div>
+        <div class="job-title" style="color:var(--green)">Diplomatura en Ciberseguridad ICS/OT</div>
+        <ul class="job-bullets">
+          <li>Universidad Nacional Santo Tomás de Aquino</li>
+          <li>Especialización en seguridad de sistemas industriales y OT</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACTO -->
+<div id="contacto" class="reveal">
+  <div class="section-label" style="text-align:center">contacto</div>
+  <h2 style="text-align:center">¿Hablamos?<em> 👾</em></h2>
+  <p style="color:var(--muted);font-size:12px;letter-spacing:1px;">Abierto a roles de Cybersecurity Engineer, SOC L2/L3, IR/DFIR y Cloud Security</p>
+  <div class="contact-grid">
+    <a href="mailto:carloabrego10@gmail.com" class="contact-card">
+      <div class="contact-card-icon">✉️</div>
+      <div class="contact-card-label">Email</div>
+      <div class="contact-card-value">carloabrego10@gmail.com</div>
+    </a>
+    <a href="https://linkedin.com/in/carloabrego" target="_blank" class="contact-card">
+      <div class="contact-card-icon">💼</div>
+      <div class="contact-card-label">LinkedIn</div>
+      <div class="contact-card-value">linkedin.com/in/carloabrego</div>
+    </a>
+    <a href="tel:+5491161946793" class="contact-card">
+      <div class="contact-card-icon">📱</div>
+      <div class="contact-card-label">Teléfono</div>
+      <div class="contact-card-value">+54 9 11 6194-6793</div>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <span>© 2026 Carlo Andres Abrego — Buenos Aires, Argentina</span>
+  <span style="color:var(--cyan)">GCIH · PCNSE · RHCSA · CCNA</span>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Typing effect in hero
+const texts = ['Cybersecurity Engineer', 'Incident Responder', 'Palo Alto PCNSE', 'GIAC GCIH 97%'];
+let ti = 0, ci = 0, deleting = false;
+const subtitle = document.querySelector('.hero-subtitle');
+
+function typeLoop() {
+  const current = texts[ti];
+  if (!deleting) {
+    subtitle.textContent = current.slice(0, ci + 1);
+    ci++;
+    if (ci === current.length) { deleting = true; setTimeout(typeLoop, 1800); return; }
+  } else {
+    subtitle.textContent = current.slice(0, ci - 1);
+    ci--;
+    if (ci === 0) { deleting = false; ti = (ti + 1) % texts.length; }
+  }
+  setTimeout(typeLoop, deleting ? 40 : 80);
+}
+setTimeout(typeLoop, 1200);
+</script>
+
+</body>
+</html>
